@@ -24,11 +24,11 @@ export class UserService {
     return from(this.userRepository.find());
   }
 
-  deleteOne(id: number): Observable<any> {
-    return from(this.userRepository.delete(id));
-  }
-
   updateOne(id: number, user: User): Observable<any> {
     return from(this.userRepository.update(id, user));
+  }
+
+  deleteOne(id: number): Observable<any> {
+    return from(this.userRepository.delete(id));
   }
 }
