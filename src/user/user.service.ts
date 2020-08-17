@@ -44,7 +44,13 @@ export class UserService {
   }
 
   findAll(): Observable<User[]> {
-    return from(this.userRepository.find());
+    return from(this.userRepository.find()).pipe(
+      map((users: User[]) => {
+        //TODO: Check it!
+        users.forEach(v => delete v.password);
+        return users;
+      }),
+    );
   }
 
   updateOne(id: number, user: User): Observable<any> {
