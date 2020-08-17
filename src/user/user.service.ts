@@ -66,4 +66,21 @@ export class UserService {
   deleteOne(id: number): Observable<any> {
     return from(this.userRepository.delete(id));
   }
+
+  validateUser(email: string, password: string): Observable<User> {
+    return this.findByEmail(email).pipe(
+      switchMap((user: User) =>
+        this.authService.comparePasswords(password, user.password).pipe(
+          map((match: boolean) => {
+            if (match) {
+              const { password, ...result } = user;
+              return result;
+            } else {
+              throw new Error();
+            }
+          }),
+        ),
+      ),
+    );
+  }
 }
