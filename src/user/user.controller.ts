@@ -25,6 +25,15 @@ export class UserController {
     );
   }
 
+  @Post('login')
+  login(@Body() user: User): Observable<Record<string, unknown>> {
+    return this.userService.login(user).pipe(
+      map((jwt: string) => ({
+        access_token: jwt,
+      })),
+    );
+  }
+
   @Get(':id')
   findOne(@Param('id') id: number): Observable<User> {
     return this.userService.findOne(id);
