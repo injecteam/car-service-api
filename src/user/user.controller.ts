@@ -8,16 +8,21 @@ import {
   Delete,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { User } from './user.interface';
+import { catchError } from 'rxjs/operators';
 
 @Controller('users')
 export class UserController {
   constructor(private userService: UserService) {}
 
   @Post()
-  create(@Body() user: User): Observable<User> {
-    return this.userService.create(user);
+  create(@Body() user: User): Observable<User | Record<string, unknown>> {
+    return this.userService.create(user).pipe(
+      map((user: User) => user),
+      catchError(err => of({ error: err.message })),
+    );
   }
 
   @Get(':id')
@@ -35,6 +40,7 @@ export class UserController {
     return this.userService.updateOne(id, user);
   }
 
+  @Delete(':id')
   deleteOne(@Param('id') id: number): Observable<any> {
     return this.userService.deleteOne(id);
   }
