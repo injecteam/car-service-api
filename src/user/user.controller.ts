@@ -16,4 +16,9 @@ export class UserController {
   findOne(@Param('id') id: number): Observable<User> {
     return this.userService.findOne(id);
   }
+
+  @Get()
+  findAll(): Observable<User[]> {
+    return this.userService.findAll();
+  }
 }
