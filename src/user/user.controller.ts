@@ -12,6 +12,7 @@ import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { User } from './user.interface';
 import { catchError } from 'rxjs/operators';
+import { UpdateResult, DeleteResult } from 'typeorm';
 
 @Controller('users')
 export class UserController {
@@ -45,12 +46,15 @@ export class UserController {
   }
 
   @Put(':id')
-  updateOne(@Param('id') id: number, @Body() user: User): Observable<any> {
+  updateOne(
+    @Param('id') id: number,
+    @Body() user: User,
+  ): Observable<UpdateResult> {
     return this.userService.updateOne(id, user);
   }
 
   @Delete(':id')
-  deleteOne(@Param('id') id: number): Observable<any> {
+  deleteOne(@Param('id') id: number): Observable<DeleteResult> {
     return this.userService.deleteOne(id);
   }
 }
