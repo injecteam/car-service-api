@@ -1,4 +1,12 @@
-import { Controller, Post, Body, Param, Get } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Param,
+  Get,
+  Put,
+  Delete,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { Observable } from 'rxjs';
 import { User } from './user.interface';
@@ -20,5 +28,10 @@ export class UserController {
   @Get()
   findAll(): Observable<User[]> {
     return this.userService.findAll();
+  }
+
+  @Put(':id')
+  updateOne(@Param('id') id: number, @Body() user: User): Observable<any> {
+    return this.userService.updateOne(id, user);
   }
 }
