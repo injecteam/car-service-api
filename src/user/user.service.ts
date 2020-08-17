@@ -11,4 +11,8 @@ export class UserService {
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
   ) {}
+
+  create(user: User): Observable<User> {
+    return from(this.userRepository.save(user));
+  }
 }
