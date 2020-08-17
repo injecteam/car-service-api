@@ -43,6 +43,10 @@ export class UserService {
     );
   }
 
+  findByEmail(email: string): Observable<User> {
+    return from(this.userRepository.findOne({ email }));
+  }
+
   findAll(): Observable<User[]> {
     return from(this.userRepository.find()).pipe(
       map((users: User[]) => {
