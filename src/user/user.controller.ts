@@ -51,6 +51,13 @@ export class UserController {
     return this.userService.findAll();
   }
 
+  // @hasRoles('Admin')
+  // @UseGuards(JwtAuthGuard, RolesGuard)
+  // @Get()
+  // findAll(): Promise<User[]> {
+  //   return this.userService.findAll();
+  // }
+
   @Put(':id')
   updateOne(
     @Param('id') id: number,
@@ -58,6 +65,14 @@ export class UserController {
   ): Observable<UpdateResult> {
     return this.userService.updateOne(id, user);
   }
+
+  // @Put(':id')
+  // updateOne(
+  //   @Param('id') id: number,
+  //   @Body() user: User,
+  // ): Promise<UpdateResult> {
+  //   return this.userService.updateOne(id, user);
+  // }
 
   @Delete(':id')
   deleteOne(@Param('id') id: number): Observable<DeleteResult> {
