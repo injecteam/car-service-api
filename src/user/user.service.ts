@@ -56,6 +56,16 @@ export class UserService {
     );
   }
 
+  // async findAll(): Promise<User[]> {
+  //   try {
+  //     const users = await this.userRepository.find();
+  //     users.forEach(user => delete user.password);
+  //     return users;
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // }
+
   updateOne(id: number, user: User): Observable<UpdateResult> {
     return this.authService.hashPassword(user.password).pipe(
       switchMap((hashedPassword: string) => {
@@ -67,6 +77,17 @@ export class UserService {
       }),
     );
   }
+
+  // async updateOne(id: number, user: User): Promise<UpdateResult> {
+  //   delete user.email;
+  //   delete user.password;
+  //   try {
+  //     const result = await this.userRepository.update(id, user);
+  //     return result;
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // }
 
   deleteOne(id: number): Observable<DeleteResult> {
     return from(this.userRepository.delete(id));
