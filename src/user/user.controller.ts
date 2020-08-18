@@ -9,73 +9,65 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { User } from './user.interface';
-import { catchError } from 'rxjs/operators';
-import { UpdateResult, DeleteResult } from 'typeorm';
-import { hasRoles } from 'src/auth/roles.decorator';
+// import { Roles } from 'src/common/decorators/roles.decorator';
+// import { JwtAuthGuard } from 'src/auth/jwtauth.guard';
+// import { RolesGuard } from 'src/common/guards/roles.guard';
+import { SignUpRequestDto } from './dto/sign-up-request.dto';
+import { FindByEmailRequestDto } from './dto/find-by-email-request.dto';
+import { User } from './entities/user.entity';
+import { UpdateRequestDto } from './dto/update-request.dto';
+import { SignInRequestDto } from 'src/auth/dto/sign-in-request.dto';
+import { SignInResponseDto } from 'src/auth/dto/sign-in-response.dto';
 import { JwtAuthGuard } from 'src/auth/jwtauth.guard';
-import { RolesGuard } from 'src/auth/roles.guard';
 
 @Controller('users')
 export class UserController {
   constructor(private userService: UserService) {}
 
-  @Post()
-  create(@Body() user: User): Observable<User | Record<string, unknown>> {
-    return this.userService.create(user).pipe(
-      map((user: User) => user),
-      catchError(err => of({ error: err.message })),
-    );
+  @Post('signup')
+  signUp(@Body() signUpRequestDto: SignUpRequestDto): Promise<void> {
+    return this.userService.signUp(signUpRequestDto);
   }
 
-  @Post('login')
-  login(@Body() user: User): Observable<Record<string, unknown>> {
-    return this.userService.login(user).pipe(
-      map((jwt: string) => ({
-        access_token: jwt,
-      })),
-    );
+  @Post('signin')
+  async signIn(
+    @Body() signInRequestDto: SignInRequestDto,
+  ): Promise<SignInResponseDto> {
+    const jwt = await this.userService.signIn(signInRequestDto);
+    return { access_token: jwt };
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number): Observable<User> {
-    return this.userService.findOne(id);
+  findById(@Param('id') id: number): Promise<User> {
+    return this.userService.findById(id);
   }
 
-  @hasRoles('Admin')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Post('findbyemail')
+  findByEmail(
+    @Body() findByEmailRequestDto: FindByEmailRequestDto,
+  ): Promise<User> {
+    const { email } = findByEmailRequestDto;
+    return this.userService.findByEmail(email);
+  }
+
+  // @Roles('admin')
+  // @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard)
   @Get()
-  findAll(): Observable<User[]> {
+  findAll(): Promise<User[]> {
     return this.userService.findAll();
   }
 
-  // @hasRoles('Admin')
-  // @UseGuards(JwtAuthGuard, RolesGuard)
-  // @Get()
-  // findAll(): Promise<User[]> {
-  //   return this.userService.findAll();
-  // }
-
   @Put(':id')
-  updateOne(
+  update(
     @Param('id') id: number,
-    @Body() user: User,
-  ): Observable<UpdateResult> {
-    return this.userService.updateOne(id, user);
+    @Body() updateRequestDto: UpdateRequestDto,
+  ): Promise<number> {
+    return this.userService.update(id, updateRequestDto);
   }
 
-  // @Put(':id')
-  // updateOne(
-  //   @Param('id') id: number,
-  //   @Body() user: User,
-  // ): Promise<UpdateResult> {
-  //   return this.userService.updateOne(id, user);
-  // }
-
   @Delete(':id')
-  deleteOne(@Param('id') id: number): Observable<DeleteResult> {
-    return this.userService.deleteOne(id);
+  deleteOne(@Param('id') id: number): Promise<number> {
+    return this.userService.delete(id);
   }
 }
