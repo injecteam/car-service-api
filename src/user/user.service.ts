@@ -1,126 +1,123 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  InternalServerErrorException,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserEntity } from './user.entity';
-import { Repository, UpdateResult, DeleteResult } from 'typeorm';
-import { Observable, from, throwError } from 'rxjs';
-import { switchMap, map, catchError } from 'rxjs/operators';
-import { User } from './user.interface';
+import { SignUpRequestDto } from './dto/sign-up-request.dto';
 import { AuthService } from 'src/auth/auth.service';
+import { User } from './entities/user.entity';
+import { Repository } from 'typeorm';
+import { UpdateRequestDto } from './dto/update-request.dto';
+import { SignInRequestDto } from 'src/auth/dto/sign-in-request.dto';
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(UserEntity)
-    private readonly userRepository: Repository<UserEntity>,
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly authService: AuthService,
   ) {}
 
-  create(user: User): Observable<User> {
-    return this.authService.hashPassword(user.password).pipe(
-      switchMap((hashedPassword: string) => {
-        const newUser = new UserEntity();
-        newUser.email = user.email;
-        newUser.password = hashedPassword;
-
-        return from(this.userRepository.save(newUser)).pipe(
-          map((user: User) => {
-            const { password, ...result } = user;
-            return result;
-          }),
-
-          catchError(err => throwError(err)),
-        );
-      }),
-    );
+  async signUp(signUpRequestDto: SignUpRequestDto): Promise<void> {
+    try {
+      const hashedPassword = await this.authService.hashPassword(
+        signUpRequestDto.password,
+      );
+      const user = Object.assign({}, { ...signUpRequestDto });
+      user.password = hashedPassword;
+      await this.userRepository.save(user);
+    } catch (error) {
+      // TODO: Error handling
+      if (error.code === '23505')
+        throw new ConflictException('User with this email already exists');
+      throw new InternalServerErrorException();
+    }
   }
 
-  findOne(id: number): Observable<User> {
-    return from(this.userRepository.findOne({ id })).pipe(
-      map((user: User) => {
-        const { password, ...result } = user;
-        return result;
-      }),
-    );
+  async signIn(signInRequestDto: SignInRequestDto): Promise<string> {
+    try {
+      const { email, password } = signInRequestDto;
+      const user = await this.userRepository.findOne({ email });
+      if (!user) throw new UnauthorizedException();
+      const passwordsMath = await this.authService.comparePasswords(
+        password,
+        user.password,
+      );
+      if (!passwordsMath) throw new UnauthorizedException();
+      const jwt = await this.authService.generateJWT(signInRequestDto);
+      return jwt;
+    } catch (error) {
+      // TODO: Error handling
+      if (error.code === 'P0002') throw new NotFoundException();
+      throw error;
+    }
   }
 
-  findByEmail(email: string): Observable<User> {
-    return from(this.userRepository.findOne({ email }));
+  async findById(id: number): Promise<User> {
+    try {
+      const user = await this.userRepository.findOne(id);
+      if (!user) throw new NotFoundException();
+      delete user.password;
+      return user;
+    } catch (error) {
+      // TODO: Error handling
+      if (error.code === 'P0002') throw new NotFoundException();
+      throw error;
+    }
   }
 
-  findAll(): Observable<User[]> {
-    return from(this.userRepository.find()).pipe(
-      map((users: User[]) => {
-        users.forEach(v => delete v.password);
-        return users;
-      }),
-    );
+  async findByEmail(email: string): Promise<User> {
+    try {
+      const query = this.userRepository.createQueryBuilder('user');
+      query.where('user.email = :email', { email });
+      const user = await query.getOne();
+      if (!user) throw new NotFoundException();
+      delete user.password;
+      return user;
+    } catch (error) {
+      // TODO: Error handling
+      if (error.code === 'P0002') throw new NotFoundException();
+      throw error;
+    }
   }
 
-  // async findAll(): Promise<User[]> {
-  //   try {
-  //     const users = await this.userRepository.find();
-  //     users.forEach(user => delete user.password);
-  //     return users;
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // }
-
-  updateOne(id: number, user: User): Observable<UpdateResult> {
-    return this.authService.hashPassword(user.password).pipe(
-      switchMap((hashedPassword: string) => {
-        user.password = hashedPassword;
-
-        return from(this.userRepository.update(id, user)).pipe(
-          catchError(err => throwError(err)),
-        );
-      }),
-    );
+  async findAll(): Promise<User[]> {
+    try {
+      const users = await this.userRepository.find();
+      if (!users) throw new NotFoundException();
+      users.forEach(user => {
+        delete user.password;
+      });
+      return users;
+    } catch (error) {
+      // TODO: Error handling
+      if (error.code === 'P0002') throw new NotFoundException();
+      throw error;
+    }
   }
 
-  // async updateOne(id: number, user: User): Promise<UpdateResult> {
-  //   delete user.email;
-  //   delete user.password;
-  //   try {
-  //     const result = await this.userRepository.update(id, user);
-  //     return result;
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // }
-
-  deleteOne(id: number): Observable<DeleteResult> {
-    return from(this.userRepository.delete(id));
+  async update(
+    id: number,
+    updateRequestDto: UpdateRequestDto,
+  ): Promise<number> {
+    try {
+      const result = await this.userRepository.update(id, updateRequestDto);
+      return result.affected;
+    } catch (error) {
+      // TODO: Error handling
+      console.error(error);
+    }
   }
 
-  login(user: User): Observable<string> {
-    return this.validateUser(user.email, user.password).pipe(
-      switchMap((user: User) => {
-        if (user) {
-          const { password, ...payload } = user;
-          return this.authService
-            .generateJWT(payload)
-            .pipe(map((jwt: string) => jwt));
-        } else {
-          return 'Wrong credentials';
-        }
-      }),
-    );
-  }
-
-  validateUser(email: string, password: string): Observable<User> {
-    return this.findByEmail(email).pipe(
-      switchMap((user: User) =>
-        this.authService.comparePasswords(password, user.password).pipe(
-          map((match: boolean) => {
-            if (match) {
-              return user;
-            } else {
-              throw new Error();
-            }
-          }),
-        ),
-      ),
-    );
+  async delete(id: number): Promise<number> {
+    try {
+      const result = await this.userRepository.delete(id);
+      return result.affected;
+    } catch (error) {
+      // TODO: Error handling
+      console.error(error);
+    }
   }
 }
