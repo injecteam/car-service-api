@@ -1,25 +1,41 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Observable, from } from 'rxjs';
-import { User } from 'src/user/user.interface';
 import * as bcrypt from 'bcrypt';
+import { SignInRequestDto } from './dto/sign-in-request.dto';
 
 @Injectable()
 export class AuthService {
   constructor(private readonly jwtService: JwtService) {}
 
-  generateJWT(user: User): Observable<string> {
-    return from(this.jwtService.signAsync({ user }));
+  async generateJWT(signInRequestDto: SignInRequestDto): Promise<string> {
+    try {
+      const jwt = await this.jwtService.signAsync({ user: signInRequestDto });
+      return jwt;
+    } catch (error) {
+      // TODO: Error handling
+      console.error(error);
+    }
   }
 
-  hashPassword(password: string): Observable<string> {
-    return from(bcrypt.hash(password, 12));
+  async hashPassword(password: string): Promise<string> {
+    try {
+      return await bcrypt.hash(password, 12);
+    } catch (error) {
+      // TODO: Error handling
+      console.error(error);
+    }
   }
 
-  comparePasswords(
+  async comparePasswords(
     cleanPassword: string,
     hashedPassword: string,
-  ): Observable<boolean> {
-    return from(bcrypt.compare(cleanPassword, hashedPassword));
+  ): Promise<boolean> {
+    try {
+      const passwordMatch = await bcrypt.compare(cleanPassword, hashedPassword);
+      return passwordMatch;
+    } catch (error) {
+      // TODO: Error handling
+      console.error(error);
+    }
   }
 }
