@@ -6,6 +6,7 @@ import {
   Get,
   Put,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { Observable, of } from 'rxjs';
@@ -13,6 +14,9 @@ import { map } from 'rxjs/operators';
 import { User } from './user.interface';
 import { catchError } from 'rxjs/operators';
 import { UpdateResult, DeleteResult } from 'typeorm';
+import { hasRoles } from 'src/auth/roles.decorator';
+import { JwtAuthGuard } from 'src/auth/jwtauth.guard';
+import { RolesGuard } from 'src/auth/roles.guard';
 
 @Controller('users')
 export class UserController {
@@ -40,6 +44,8 @@ export class UserController {
     return this.userService.findOne(id);
   }
 
+  @hasRoles('Admin')
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Get()
   findAll(): Observable<User[]> {
     return this.userService.findAll();
