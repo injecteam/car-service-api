@@ -6,8 +6,18 @@
 	},
 	"item": [
 		{
-			"name": "users/getAll",
+			"name": "users/findAll",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjozLCJlbWFpbCI6InNsYWtAc2FtYXJhZG9tLnJ1In0sImlhdCI6MTU5Nzc0Nzk1NiwiZXhwIjoxNTk3NzQ4MDU2fQ.gNG1_zoFF8Pgt0ZP58IZr4YzazoCYGED1L6UI_35BiE",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
@@ -26,12 +36,12 @@
 			"response": []
 		},
 		{
-			"name": "users/getOneById",
+			"name": "users/findById",
 			"request": {
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3000/users/3",
+					"raw": "http://localhost:3000/users/4",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -39,14 +49,72 @@
 					"port": "3000",
 					"path": [
 						"users",
-						"3"
+						"4"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "users/create",
+			"name": "users/findByEmail",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"slak@samaradom.ru\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/users/findbyemail",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"users",
+						"findbyemail"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "users/signup",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"slak@samaradom.ru\",\n    \"name\": \"nikolai\",\n    \"surname\": \"sladkii\",\n    \"password\": \"Password1\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/users/signup",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"users",
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "users/signin",
 			"request": {
 				"method": "POST",
 				"header": [],
@@ -60,7 +128,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/users/",
+					"raw": "http://localhost:3000/users/signin",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -68,20 +136,20 @@
 					"port": "3000",
 					"path": [
 						"users",
-						""
+						"signin"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "users/updateOne",
+			"name": "users/update",
 			"request": {
 				"method": "PUT",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"email\": \"slak2@samaradom.ru\",\n    \"password\": \"password\"\n}",
+					"raw": "{   \n    \"name\": \"hellosiki\",\n    \"email\": \"slak2@samaradom.ru\",\n    \"password\": \"\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -89,7 +157,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/users/1",
+					"raw": "http://localhost:3000/users/4",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -97,14 +165,14 @@
 					"port": "3000",
 					"path": [
 						"users",
-						"1"
+						"4"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "users/deleteOne",
+			"name": "users/delete",
 			"request": {
 				"method": "DELETE",
 				"header": [],
@@ -118,7 +186,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/users/1",
+					"raw": "http://localhost:3000/users/9",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -126,36 +194,7 @@
 					"port": "3000",
 					"path": [
 						"users",
-						"1"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "users/login",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"email\": \"slak@samaradom.ru\",\n    \"password\": \"password\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:3000/users/login",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"users",
-						"login"
+						"9"
 					]
 				}
 			},
