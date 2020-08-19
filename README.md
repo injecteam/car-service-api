@@ -1,8 +1,8 @@
-# nestjs-auth-test
+# car-service-api
 
 ## Description
 
-Example project with auth using nest.js
+An API for the car service
 
 ## Installation
 
