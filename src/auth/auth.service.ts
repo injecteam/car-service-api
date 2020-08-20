@@ -1,15 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { SignInRequestDto } from './dto/sign-in-request.dto';
 
 @Injectable()
 export class AuthService {
   constructor(private readonly jwtService: JwtService) {}
 
-  async generateJWT(signInRequestDto: SignInRequestDto): Promise<string> {
+  async generateJWT(userAuthPayload: UserAuthPayload): Promise<string> {
     try {
-      const jwt = await this.jwtService.signAsync({ user: signInRequestDto });
+      const jwt = await this.jwtService.signAsync({ user: userAuthPayload });
       return jwt;
     } catch (error) {
       // TODO: Error handling
