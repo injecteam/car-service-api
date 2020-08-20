@@ -9,14 +9,7 @@ import {
 } from 'class-validator';
 import { User } from './user.entity';
 
-export class FindByEmailRequestDto {
-  @IsEmail()
-  @MinLength(5)
-  @MaxLength(30)
-  readonly email: string;
-}
-
-export class UpdateRequestDto {
+export class UpdateRequestDTO {
   @IsOptional()
   @IsString()
   @MinLength(3)
@@ -34,7 +27,9 @@ export class UpdateRequestDto {
   readonly age?: number;
 }
 
-export class SignUpRequestDto {
+export class UpdateResponseDTO extends User {}
+
+export class SignUpRequestDTO {
   @IsString()
   @MinLength(3)
   @MaxLength(30)
@@ -63,4 +58,8 @@ export class SignUpRequestDto {
   readonly password: string;
 }
 
-export class SignUpResponseDto extends User {}
+export class SignUpResponseDTO extends User {}
+
+export class FindByEmailResponseDTO extends User {}
+
+export class FindByIdResponseDTO extends User {}
