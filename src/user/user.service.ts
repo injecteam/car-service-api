@@ -6,12 +6,18 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { SignUpRequestDto } from './dto/sign-up-request.dto';
+import {
+  SignUpRequestDTO,
+  SignUpResponseDTO,
+  FindByIdResponseDTO,
+  FindByEmailResponseDTO,
+  UpdateResponseDTO,
+} from './user.dto';
 import { AuthService } from 'src/auth/auth.service';
-import { User } from './entities/user.entity';
+import { User } from './user.entity';
 import { Repository } from 'typeorm';
-import { UpdateRequestDto } from './dto/update-request.dto';
-import { SignInRequestDto } from 'src/auth/dto/sign-in-request.dto';
+import { UpdateRequestDTO } from './user.dto';
+import { SignInRequestDTO, SignInResponseDTO } from 'src/auth/auth.dto';
 
 @Injectable()
 export class UserService {
@@ -20,55 +26,53 @@ export class UserService {
     private readonly authService: AuthService,
   ) {}
 
-  async signUp(signUpRequestDto: SignUpRequestDto): Promise<void> {
+  async signUp(signUpRequestDTO: SignUpRequestDTO): Promise<SignUpResponseDTO> {
     try {
       const hashedPassword = await this.authService.hashPassword(
-        signUpRequestDto.password,
+        signUpRequestDTO.password,
       );
-      const user = Object.assign({}, { ...signUpRequestDto });
+      const user = this.userRepository.create(signUpRequestDTO);
       user.password = hashedPassword;
       await this.userRepository.save(user);
+      return user;
     } catch (error) {
-      // TODO: Error handling
       if (error.code === '23505')
         throw new ConflictException('User with this email already exists');
       throw new InternalServerErrorException();
     }
   }
 
-  async signIn(signInRequestDto: SignInRequestDto): Promise<string> {
+  async signIn(signInRequestDTO: SignInRequestDTO): Promise<SignInResponseDTO> {
     try {
-      const { email, password } = signInRequestDto;
+      const { email, password } = signInRequestDTO;
       const user = await this.userRepository.findOne({ email });
-      if (!user) throw new UnauthorizedException();
-      const passwordsMath = await this.authService.comparePasswords(
+      if (!user) throw new UnauthorizedException('Invalid credentials');
+      const isValidPassword = await this.authService.comparePasswords(
         password,
         user.password,
       );
-      if (!passwordsMath) throw new UnauthorizedException();
-      const jwt = await this.authService.generateJWT(signInRequestDto);
-      return jwt;
+      if (!isValidPassword)
+        throw new UnauthorizedException('Invalid credentials');
+      const jwt = await this.authService.generateJWT({ email });
+      return { access_token: jwt };
     } catch (error) {
-      // TODO: Error handling
-      if (error.code === 'P0002') throw new NotFoundException();
-      throw error;
+      throw new UnauthorizedException('Invalid credentials');
     }
   }
 
-  async findById(id: number): Promise<User> {
+  async findById(id: number): Promise<FindByIdResponseDTO> {
     try {
       const user = await this.userRepository.findOne(id);
       if (!user) throw new NotFoundException();
       delete user.password;
       return user;
     } catch (error) {
-      // TODO: Error handling
       if (error.code === 'P0002') throw new NotFoundException();
-      throw error;
+      throw new InternalServerErrorException();
     }
   }
 
-  async findByEmail(email: string): Promise<User> {
+  async findByEmail(email: string): Promise<FindByEmailResponseDTO> {
     try {
       const query = this.userRepository.createQueryBuilder('user');
       query.where('user.email = :email', { email });
@@ -77,13 +81,12 @@ export class UserService {
       delete user.password;
       return user;
     } catch (error) {
-      // TODO: Error handling
       if (error.code === 'P0002') throw new NotFoundException();
-      throw error;
+      throw new InternalServerErrorException();
     }
   }
 
-  async findAll(): Promise<User[]> {
+  async findAll(): Promise<FindByIdResponseDTO[]> {
     try {
       const users = await this.userRepository.find();
       if (!users) throw new NotFoundException();
@@ -92,22 +95,21 @@ export class UserService {
       });
       return users;
     } catch (error) {
-      // TODO: Error handling
       if (error.code === 'P0002') throw new NotFoundException();
-      throw error;
+      throw new InternalServerErrorException();
     }
   }
 
   async update(
     id: number,
-    updateRequestDto: UpdateRequestDto,
-  ): Promise<number> {
+    updateRequestDTO: UpdateRequestDTO,
+  ): Promise<UpdateResponseDTO> {
     try {
-      const result = await this.userRepository.update(id, updateRequestDto);
-      return result.affected;
+      await this.userRepository.update(id, updateRequestDTO);
+      const user = await this.userRepository.findOne(id);
+      return user;
     } catch (error) {
-      // TODO: Error handling
-      console.error(error);
+      throw new InternalServerErrorException();
     }
   }
 
@@ -116,8 +118,7 @@ export class UserService {
       const result = await this.userRepository.delete(id);
       return result.affected;
     } catch (error) {
-      // TODO: Error handling
-      console.error(error);
+      throw new InternalServerErrorException();
     }
   }
 }
