@@ -6,67 +6,73 @@ import {
   Get,
   Put,
   Delete,
+  ValidationPipe,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-// import { Roles } from 'src/common/decorators/roles.decorator';
-// import { JwtAuthGuard } from 'src/auth/jwtauth.guard';
-// import { RolesGuard } from 'src/common/guards/roles.guard';
-import { SignUpRequestDto } from './dto/sign-up-request.dto';
-import { FindByEmailRequestDto } from './dto/find-by-email-request.dto';
-import { User } from './entities/user.entity';
-import { UpdateRequestDto } from './dto/update-request.dto';
-import { SignInRequestDto } from 'src/auth/dto/sign-in-request.dto';
-import { SignInResponseDto } from 'src/auth/dto/sign-in-response.dto';
 import { JwtAuthGuard } from 'src/auth/jwtauth.guard';
+import {
+  SignUpRequestDTO,
+  SignUpResponseDTO,
+  FindByIdResponseDTO,
+  FindByEmailResponseDTO,
+  UpdateRequestDTO,
+  UpdateResponseDTO,
+} from './user.dto';
+import { SignInRequestDTO, SignInResponseDTO } from 'src/auth/auth.dto';
 
 @Controller('users')
 export class UserController {
   constructor(private userService: UserService) {}
 
   @Post('signup')
-  signUp(@Body() signUpRequestDto: SignUpRequestDto): Promise<void> {
-    return this.userService.signUp(signUpRequestDto);
+  signUp(
+    @Body(new ValidationPipe({ whitelist: true }))
+    signUpRequestDTO: SignUpRequestDTO,
+  ): Promise<SignUpResponseDTO> {
+    console.log(signUpRequestDTO);
+    return this.userService.signUp(signUpRequestDTO);
   }
 
   @Post('signin')
-  async signIn(
-    @Body() signInRequestDto: SignInRequestDto,
-  ): Promise<SignInResponseDto> {
-    const jwt = await this.userService.signIn(signInRequestDto);
-    return { access_token: jwt };
+  signIn(
+    @Body() signInRequestDTO: SignInRequestDTO,
+  ): Promise<SignInResponseDTO> {
+    return this.userService.signIn(signInRequestDTO);
+  }
+
+  @Get('findbyemail')
+  // @UseGuards(JwtAuthGuard)
+  findByEmail(@Query('email') email: string): Promise<FindByEmailResponseDTO> {
+    console.log(email);
+    return this.userService.findByEmail(email);
   }
 
   @Get(':id')
-  findById(@Param('id') id: number): Promise<User> {
+  findById(@Param('id') id: number): Promise<FindByIdResponseDTO> {
     return this.userService.findById(id);
-  }
-
-  @Post('findbyemail')
-  findByEmail(
-    @Body() findByEmailRequestDto: FindByEmailRequestDto,
-  ): Promise<User> {
-    const { email } = findByEmailRequestDto;
-    return this.userService.findByEmail(email);
   }
 
   // @Roles('admin')
   // @UseGuards(JwtAuthGuard, RolesGuard)
-  @UseGuards(JwtAuthGuard)
   @Get()
-  findAll(): Promise<User[]> {
+  findAll(): Promise<FindByIdResponseDTO[]> {
     return this.userService.findAll();
   }
 
   @Put(':id')
+  @UseGuards(JwtAuthGuard)
   update(
     @Param('id') id: number,
-    @Body() updateRequestDto: UpdateRequestDto,
-  ): Promise<number> {
-    return this.userService.update(id, updateRequestDto);
+    @Body(new ValidationPipe({ whitelist: true }))
+    updateRequestDTO: UpdateRequestDTO,
+  ): Promise<UpdateResponseDTO> {
+    return this.userService.update(id, updateRequestDTO);
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
   deleteOne(@Param('id') id: number): Promise<number> {
     return this.userService.delete(id);
   }
