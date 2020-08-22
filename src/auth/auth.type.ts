@@ -1,9 +1,12 @@
-type UserAuthPayload = {
+type UserJwtPayload = {
+  id: number;
+  name: string;
+  surname: string;
   email: string;
 };
 
 type AuthPayload = {
-  user: UserAuthPayload;
+  user: UserJwtPayload;
   iat: number;
   exp: number;
 };
