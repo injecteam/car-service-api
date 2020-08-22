@@ -6,9 +6,9 @@ import * as bcrypt from 'bcrypt';
 export class AuthService {
   constructor(private readonly jwtService: JwtService) {}
 
-  async generateJWT(userAuthPayload: UserAuthPayload): Promise<string> {
+  async generateJWT(userJwtPayload: UserJwtPayload): Promise<string> {
     try {
-      const jwt = await this.jwtService.signAsync({ user: userAuthPayload });
+      const jwt = await this.jwtService.signAsync({ user: userJwtPayload });
       return jwt;
     } catch (error) {
       // TODO: Error handling
