@@ -13,7 +13,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  validate(authPayload: AuthPayload): UserAuthPayload {
+  validate(authPayload: AuthPayload): UserJwtPayload {
     return authPayload.user;
   }
 }
