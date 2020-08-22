@@ -19,8 +19,11 @@ import {
   FindByEmailResponseDTO,
   UpdateRequestDTO,
   UpdateResponseDTO,
+  SignInRequestDTO,
+  SignInResponseDTO,
 } from './user.dto';
-import { SignInRequestDTO, SignInResponseDTO } from 'src/auth/auth.dto';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { RolesGuard } from 'src/common/guards/roles.guard';
 
 @Controller('users')
 export class UserController {
@@ -54,7 +57,8 @@ export class UserController {
     return this.userService.findById(id);
   }
 
-  // @Roles('admin')
+  @Roles('admin')
+  @UseGuards(JwtAuthGuard)
   // @UseGuards(JwtAuthGuard, RolesGuard)
   @Get()
   findAll(): Promise<FindByIdResponseDTO[]> {
