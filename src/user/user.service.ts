@@ -12,12 +12,13 @@ import {
   FindByIdResponseDTO,
   FindByEmailResponseDTO,
   UpdateResponseDTO,
+  SignInRequestDTO,
+  SignInResponseDTO,
 } from './user.dto';
 import { AuthService } from 'src/auth/auth.service';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
 import { UpdateRequestDTO } from './user.dto';
-import { SignInRequestDTO, SignInResponseDTO } from 'src/auth/auth.dto';
 
 @Injectable()
 export class UserService {
@@ -53,7 +54,13 @@ export class UserService {
       );
       if (!isValidPassword)
         throw new UnauthorizedException('Invalid credentials');
-      const jwt = await this.authService.generateJWT({ email });
+      const userJwtPayload = {
+        id: user.id,
+        name: user.name,
+        surname: user.surname,
+        email,
+      };
+      const jwt = await this.authService.generateJWT(userJwtPayload);
       return { access_token: jwt };
     } catch (error) {
       throw new UnauthorizedException('Invalid credentials');
