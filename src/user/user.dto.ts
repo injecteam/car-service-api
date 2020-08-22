@@ -9,6 +9,10 @@ import {
 } from 'class-validator';
 import { User } from './user.entity';
 
+export class FindByEmailResponseDTO extends User {}
+
+export class FindByIdResponseDTO extends User {}
+
 export class UpdateRequestDTO {
   @IsOptional()
   @IsString()
@@ -60,6 +64,15 @@ export class SignUpRequestDTO {
 
 export class SignUpResponseDTO extends User {}
 
-export class FindByEmailResponseDTO extends User {}
+export class SignInRequestDTO {
+  @IsEmail()
+  readonly email: string;
 
-export class FindByIdResponseDTO extends User {}
+  @IsString()
+  readonly password: string;
+}
+
+export class SignInResponseDTO {
+  @IsString()
+  readonly access_token: string;
+}
