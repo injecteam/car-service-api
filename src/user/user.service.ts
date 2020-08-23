@@ -14,27 +14,32 @@ import {
   UpdateResponseDTO,
   SignInRequestDTO,
   SignInResponseDTO,
+  FindByResponseDTO,
 } from './user.dto';
-import { AuthService } from 'src/auth/auth.service';
+import { AuthenticationService } from 'src/authentication/authentication.service';
 import { User } from './user.entity';
-import { Repository } from 'typeorm';
+import { Repository, DeleteResult } from 'typeorm';
 import { UpdateRequestDTO } from './user.dto';
+import { UserJwtPayload } from 'src/authentication/authentication.type';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
-    private readonly authService: AuthService,
+    private readonly authenticationService: AuthenticationService,
   ) {}
 
   async signUp(signUpRequestDTO: SignUpRequestDTO): Promise<SignUpResponseDTO> {
     try {
-      const hashedPassword = await this.authService.hashPassword(
+      const hashedPassword: string = await this.authenticationService.hashPassword(
         signUpRequestDTO.password,
       );
-      const user = this.userRepository.create(signUpRequestDTO);
+      const user: SignUpResponseDTO = this.userRepository.create(
+        signUpRequestDTO,
+      );
       user.password = hashedPassword;
       await this.userRepository.save(user);
+      delete user.password;
       return user;
     } catch (error) {
       if (error.code === '23505')
@@ -46,21 +51,26 @@ export class UserService {
   async signIn(signInRequestDTO: SignInRequestDTO): Promise<SignInResponseDTO> {
     try {
       const { email, password } = signInRequestDTO;
-      const user = await this.userRepository.findOne({ email });
+      const user: User = await this.userRepository.findOne({
+        email,
+      });
       if (!user) throw new UnauthorizedException('Invalid credentials');
-      const isValidPassword = await this.authService.comparePasswords(
+      const isValidPassword: boolean = await this.authenticationService.comparePasswords(
         password,
         user.password,
       );
       if (!isValidPassword)
         throw new UnauthorizedException('Invalid credentials');
-      const userJwtPayload = {
+      const userJwtPayload: UserJwtPayload = {
         id: user.id,
         name: user.name,
         surname: user.surname,
         email,
+        role: user.role,
       };
-      const jwt = await this.authService.generateJWT(userJwtPayload);
+      const jwt: string = await this.authenticationService.generateJWT(
+        userJwtPayload,
+      );
       return { access_token: jwt };
     } catch (error) {
       throw new UnauthorizedException('Invalid credentials');
@@ -69,7 +79,7 @@ export class UserService {
 
   async findById(id: number): Promise<FindByIdResponseDTO> {
     try {
-      const user = await this.userRepository.findOne(id);
+      const user: FindByIdResponseDTO = await this.userRepository.findOne(id);
       if (!user) throw new NotFoundException();
       delete user.password;
       return user;
@@ -83,7 +93,7 @@ export class UserService {
     try {
       const query = this.userRepository.createQueryBuilder('user');
       query.where('user.email = :email', { email });
-      const user = await query.getOne();
+      const user: FindByEmailResponseDTO = await query.getOne();
       if (!user) throw new NotFoundException();
       delete user.password;
       return user;
@@ -93,13 +103,11 @@ export class UserService {
     }
   }
 
-  async findAll(): Promise<FindByIdResponseDTO[]> {
+  async findAll(): Promise<FindByResponseDTO[]> {
     try {
-      const users = await this.userRepository.find();
+      const users: FindByIdResponseDTO[] = await this.userRepository.find();
       if (!users) throw new NotFoundException();
-      users.forEach(user => {
-        delete user.password;
-      });
+      users.forEach(user => delete user.password);
       return users;
     } catch (error) {
       if (error.code === 'P0002') throw new NotFoundException();
@@ -113,7 +121,8 @@ export class UserService {
   ): Promise<UpdateResponseDTO> {
     try {
       await this.userRepository.update(id, updateRequestDTO);
-      const user = await this.userRepository.findOne(id);
+      const user: UpdateResponseDTO = await this.userRepository.findOne(id);
+      delete user.password;
       return user;
     } catch (error) {
       throw new InternalServerErrorException();
@@ -122,8 +131,9 @@ export class UserService {
 
   async delete(id: number): Promise<number> {
     try {
-      const result = await this.userRepository.delete(id);
-      return result.affected;
+      const result: DeleteResult = await this.userRepository.delete(id);
+      const affected: number | null = result.affected;
+      return affected;
     } catch (error) {
       throw new InternalServerErrorException();
     }
