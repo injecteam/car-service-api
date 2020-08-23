@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { UserJwtPayload } from './authentication.type';
 
 @Injectable()
-export class AuthService {
+export class AuthenticationService {
   constructor(private readonly jwtService: JwtService) {}
 
   async generateJWT(userJwtPayload: UserJwtPayload): Promise<string> {
