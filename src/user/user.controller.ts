@@ -11,7 +11,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { JwtAuthGuard } from 'src/auth/jwtauth.guard';
+import { AuthenticationJwtGuard } from 'src/authentication/jwtauth.guard';
 import {
   SignUpRequestDTO,
   SignUpResponseDTO,
@@ -22,8 +22,11 @@ import {
   SignInRequestDTO,
   SignInResponseDTO,
 } from './user.dto';
-import { Roles } from 'src/common/decorators/roles.decorator';
-import { RolesGuard } from 'src/common/guards/roles.guard';
+import { Roles } from 'src/authorization/roles.decorator';
+import { OwnOrRoleGuard } from 'src/authorization/own-or-role.guard';
+import { RoleGuard } from 'src/authorization/role.guard';
+import { AuthorizationRole } from 'src/authorization/authorization-role.enum';
+// import { RolesGuard } from 'src/roles/roles.guard';
 
 @Controller('users')
 export class UserController {
@@ -34,7 +37,6 @@ export class UserController {
     @Body(new ValidationPipe({ whitelist: true }))
     signUpRequestDTO: SignUpRequestDTO,
   ): Promise<SignUpResponseDTO> {
-    console.log(signUpRequestDTO);
     return this.userService.signUp(signUpRequestDTO);
   }
 
@@ -46,9 +48,9 @@ export class UserController {
   }
 
   @Get('findbyemail')
-  // @UseGuards(JwtAuthGuard)
+  @Roles(AuthorizationRole.ADMIN)
+  @UseGuards(AuthenticationJwtGuard, RoleGuard)
   findByEmail(@Query('email') email: string): Promise<FindByEmailResponseDTO> {
-    console.log(email);
     return this.userService.findByEmail(email);
   }
 
@@ -57,16 +59,14 @@ export class UserController {
     return this.userService.findById(id);
   }
 
-  @Roles('admin')
-  @UseGuards(JwtAuthGuard)
-  // @UseGuards(JwtAuthGuard, RolesGuard)
   @Get()
   findAll(): Promise<FindByIdResponseDTO[]> {
     return this.userService.findAll();
   }
 
   @Put(':id')
-  @UseGuards(JwtAuthGuard)
+  @Roles(AuthorizationRole.ADMIN)
+  @UseGuards(AuthenticationJwtGuard, OwnOrRoleGuard)
   update(
     @Param('id') id: number,
     @Body(new ValidationPipe({ whitelist: true }))
@@ -76,7 +76,8 @@ export class UserController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard)
+  @Roles(AuthorizationRole.ADMIN)
+  @UseGuards(AuthenticationJwtGuard, RoleGuard)
   deleteOne(@Param('id') id: number): Promise<number> {
     return this.userService.delete(id);
   }
