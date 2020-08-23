@@ -2,7 +2,8 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
-import { AuthModule } from './auth/auth.module';
+import { AuthenticationModule } from './authentication/authentication.module';
+import { AuthorizationModule } from './authorization/authorization.module';
 
 @Module({
   imports: [
@@ -19,7 +20,8 @@ import { AuthModule } from './auth/auth.module';
       logging: true,
     }),
     UserModule,
-    AuthModule,
+    AuthenticationModule,
+    AuthorizationModule,
   ],
   controllers: [],
   providers: [],
