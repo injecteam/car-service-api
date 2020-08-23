@@ -9,9 +9,11 @@ import {
 } from 'class-validator';
 import { User } from './user.entity';
 
-export class FindByEmailResponseDTO extends User {}
+export class FindByResponseDTO extends User {}
 
-export class FindByIdResponseDTO extends User {}
+export class FindByEmailResponseDTO extends FindByResponseDTO {}
+
+export class FindByIdResponseDTO extends FindByResponseDTO {}
 
 export class UpdateRequestDTO {
   @IsOptional()
@@ -66,6 +68,8 @@ export class SignUpResponseDTO extends User {}
 
 export class SignInRequestDTO {
   @IsEmail()
+  @MinLength(5)
+  @MaxLength(30)
   readonly email: string;
 
   @IsString()
