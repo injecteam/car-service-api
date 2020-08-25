@@ -7,7 +7,9 @@ import {
   MaxLength,
   IsNumber,
   IsEmail,
+  IsEnum,
 } from 'class-validator';
+import { Exclude } from 'class-transformer';
 
 @Entity('users')
 export class User extends AbstractEntity {
@@ -36,10 +38,12 @@ export class User extends AbstractEntity {
     enum: AuthorizationRole,
     default: AuthorizationRole.USER,
   })
+  @IsEnum(AuthorizationRole)
   role: AuthorizationRole;
 
   @Column()
   @IsString()
+  @Exclude({ toPlainOnly: true })
   password: string;
 
   @BeforeInsert()
