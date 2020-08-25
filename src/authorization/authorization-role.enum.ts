@@ -1,5 +1,5 @@
 export enum AuthorizationRole {
+  SUPER = 'super',
   ADMIN = 'admin',
-  EDITOR = 'editor',
   USER = 'user',
 }
