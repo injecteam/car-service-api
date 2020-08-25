@@ -14,7 +14,9 @@ import {
   UpdateResponseDTO,
   SignInRequestDTO,
   SignInResponseDTO,
-  FindByResponseDTO,
+  FindAllResponseDTO,
+  UpdateRoleRequestDTO,
+  UpdateRoleResponseDTO,
 } from './user.dto';
 import { AuthenticationService } from 'src/authentication/authentication.service';
 import { User } from './user.entity';
@@ -39,7 +41,6 @@ export class UserService {
       );
       user.password = hashedPassword;
       await this.userRepository.save(user);
-      delete user.password;
       return user;
     } catch (error) {
       if (error.code === '23505')
@@ -81,7 +82,7 @@ export class UserService {
     try {
       const user: FindByIdResponseDTO = await this.userRepository.findOne(id);
       if (!user) throw new NotFoundException();
-      delete user.password;
+      delete user.role;
       return user;
     } catch (error) {
       if (error.code === 'P0002') throw new NotFoundException();
@@ -95,7 +96,6 @@ export class UserService {
       query.where('user.email = :email', { email });
       const user: FindByEmailResponseDTO = await query.getOne();
       if (!user) throw new NotFoundException();
-      delete user.password;
       return user;
     } catch (error) {
       if (error.code === 'P0002') throw new NotFoundException();
@@ -103,11 +103,11 @@ export class UserService {
     }
   }
 
-  async findAll(): Promise<FindByResponseDTO[]> {
+  async findAll(): Promise<FindAllResponseDTO[]> {
     try {
-      const users: FindByIdResponseDTO[] = await this.userRepository.find();
+      const users: FindAllResponseDTO[] = await this.userRepository.find();
       if (!users) throw new NotFoundException();
-      users.forEach(user => delete user.password);
+      users.forEach(user => delete user.role);
       return users;
     } catch (error) {
       if (error.code === 'P0002') throw new NotFoundException();
@@ -122,7 +122,6 @@ export class UserService {
     try {
       await this.userRepository.update(id, updateRequestDTO);
       const user: UpdateResponseDTO = await this.userRepository.findOne(id);
-      delete user.password;
       return user;
     } catch (error) {
       throw new InternalServerErrorException();
@@ -134,6 +133,19 @@ export class UserService {
       const result: DeleteResult = await this.userRepository.delete(id);
       const affected: number | null = result.affected;
       return affected;
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
+  }
+
+  async updateRole(
+    id: number,
+    updateRoleRequestDTO: UpdateRoleRequestDTO,
+  ): Promise<UpdateRoleResponseDTO> {
+    try {
+      await this.userRepository.update(id, updateRoleRequestDTO);
+      const user: UpdateRoleResponseDTO = await this.userRepository.findOne(id);
+      return user;
     } catch (error) {
       throw new InternalServerErrorException();
     }
