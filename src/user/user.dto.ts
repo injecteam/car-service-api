@@ -6,14 +6,16 @@ import {
   IsEmail,
   Matches,
   MaxLength,
+  IsEnum,
 } from 'class-validator';
 import { User } from './user.entity';
+import { AuthorizationRole } from 'src/authorization/authorization-role.enum';
 
-export class FindByResponseDTO extends User {}
+export class FindAllResponseDTO extends User {}
 
-export class FindByEmailResponseDTO extends FindByResponseDTO {}
+export class FindByEmailResponseDTO extends User {}
 
-export class FindByIdResponseDTO extends FindByResponseDTO {}
+export class FindByIdResponseDTO extends User {}
 
 export class UpdateRequestDTO {
   @IsOptional()
@@ -34,6 +36,13 @@ export class UpdateRequestDTO {
 }
 
 export class UpdateResponseDTO extends User {}
+
+export class UpdateRoleRequestDTO {
+  @IsEnum(AuthorizationRole)
+  role: AuthorizationRole;
+}
+
+export class UpdateRoleResponseDTO extends User {}
 
 export class SignUpRequestDTO {
   @IsString()
