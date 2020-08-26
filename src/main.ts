@@ -1,5 +1,5 @@
-import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
@@ -11,7 +11,8 @@ async function bootstrap() {
     .setTitle('Car Service API')
     .setDescription('An API for the car service')
     .setVersion('0.3.0')
-    .addTag('car_service_api')
+    .addTag('User')
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api', app, document);
