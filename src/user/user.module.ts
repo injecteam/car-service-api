@@ -1,10 +1,10 @@
+import { User } from './user.entity';
 import { Module } from '@nestjs/common';
 import { UserService } from './user.service';
-import { UserController } from './user.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthenticationModule } from 'src/authentication/authentication.module';
-import { User } from './user.entity';
+import { UserController } from './user.controller';
 import { AuthorizationModule } from 'src/authorization/authorization.module';
+import { AuthenticationModule } from 'src/authentication/authentication.module';
 
 @Module({
   imports: [
