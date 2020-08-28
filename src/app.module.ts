@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthorizationModule } from './authorization/authorization.module';
 import { AuthenticationModule } from './authentication/authentication.module';
+import { MailerModule } from './mailer/mailer.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { AuthenticationModule } from './authentication/authentication.module';
     UserModule,
     AuthenticationModule,
     AuthorizationModule,
+    MailerModule,
   ],
   controllers: [],
   providers: [],
