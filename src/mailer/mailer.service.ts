@@ -2,23 +2,23 @@ import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 @Injectable()
 export class MailerService {
-  async sendTestEmail(): Promise<void> {
+  async send(
+    from: string,
+    to: string,
+    subject: string,
+    html: string,
+  ): Promise<void> {
     const transport = nodemailer.createTransport({
-      host: 'smtp.sendgrid.net',
-      port: 465,
-      secure: true,
+      host: process.env.NODE_MAILER_HOST,
+      port: Number(process.env.NODE_MAILER_PORT),
+      secure: Boolean(process.env.NODE_MAILER_SECURE),
       auth: {
-        user: process.env.EMAIL_SERVICE_USER,
-        pass: process.env.EMAIL_SERVICE_PASSWORD,
+        user: process.env.NODE_MAILER_USER,
+        pass: process.env.NODE_MAILER_PASSWORD,
       },
     });
 
-    const result = await transport.sendMail({
-      from: '"car_service_api" <foo@example.com>',
-      to: 'slak@samaradom.ru',
-      subject: 'Test email ✔',
-      html: '<b>Do u see mee?<b>',
-    });
+    const result = await transport.sendMail({ from, to, subject, html });
 
     console.info(result);
   }
