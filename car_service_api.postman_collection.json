@@ -71,7 +71,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoxLCJuYW1lIjoibmlrb2xhaSIsInN1cm5hbWUiOiJzbGFka2lpIiwiZW1haWwiOiJzbGFrQHNhbWFyYWRvbS5ydSIsInJvbGUiOiJhZG1pbiJ9LCJpYXQiOjE1OTg5MDkwMzcsImV4cCI6MTU5ODkxOTAzN30.zuCKAApgMaYTJEXPHrh7VEKVGXoL0jVMwXJJIbKPqpY",
 									"type": "string"
 								}
 							]
@@ -117,7 +117,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoxLCJuYW1lIjoibmlrb2xhaSIsInN1cm5hbWUiOiJzbGFka2lpIiwiZW1haWwiOiJzbGFrQHNhbWFyYWRvbS5ydSIsInJvbGUiOiJ1c2VyIn0sImlhdCI6MTU5ODIxNTkyMSwiZXhwIjoxNTk4MjI1OTIxfQ.H15nq8VcpYQUSIaZlYJ4XwaLjqZf1eWQ25EMZ4SrUdo",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoxLCJuYW1lIjoibmlrb2xhaSIsInN1cm5hbWUiOiJzbGFka2lpIiwiZW1haWwiOiJzbGFrQHNhbWFyYWRvbS5ydSIsInJvbGUiOiJhZG1pbiJ9LCJpYXQiOjE1OTg5MDkwMzcsImV4cCI6MTU5ODkxOTAzN30.zuCKAApgMaYTJEXPHrh7VEKVGXoL0jVMwXJJIbKPqpY",
 									"type": "string"
 								}
 							]
@@ -126,47 +126,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{   \n    \"name\": \"hellosiki1\",\n    \"email\": \"slak211111@samaradom.ru\",\n    \"password\": \"123411115\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:3000/api/users/2",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"api",
-								"users",
-								"2"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "delete",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoxLCJuYW1lIjoiaGVsbG9zaWtpMSIsInN1cm5hbWUiOiJzbGFka2lpIiwiZW1haWwiOiJzbGFrQHNhbWFyYWRvbS5ydSIsInJvbGUiOiJhZG1pbiJ9LCJpYXQiOjE1OTgyMTcyMzQsImV4cCI6MTU5ODIyNzIzNH0.yoqju59kBQVVSE7GvHOG5zUohMg0E8uf2Cj_SxG_K3Q",
-									"type": "string"
-								}
-							]
-						},
-						"method": "DELETE",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
+							"raw": "{   \n    \"name\": \"supernikolai\",\n    \"email\": \"slak211111@samaradom.ru\",\n    \"password\": \"123411115\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -184,6 +144,46 @@
 								"api",
 								"users",
 								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoxLCJuYW1lIjoic3VwZXJuaWtvbGFpIiwic3VybmFtZSI6InNsYWRraWkiLCJlbWFpbCI6InNsYWtAc2FtYXJhZG9tLnJ1Iiwicm9sZSI6InN1cGVyIn0sImlhdCI6MTU5ODkwOTk0NywiZXhwIjoxNTk4OTE5OTQ3fQ.WnfVY9mF-jbpSZRGwD5ELFiPUMug_JaXBA3LBKkaVBA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/users/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"users",
+								"2"
 							]
 						}
 					},
@@ -227,7 +227,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImVtYWlsIjoic2xha0BzYW1hcmFkb20ucnUiLCJwYXNzd29yZCI6IlBhc3N3b3JkMSJ9LCJpYXQiOjE1OTc3ODkwNzAsImV4cCI6MTU5Nzc4OTE3MH0.ixVnVJnwOmQLZii-QUfU4Xn43pa60QDwTblswpTtvwI",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoyLCJuYW1lIjoibmlrb2xhcyIsInN1cm5hbWUiOiJtZWx1aSIsImVtYWlsIjoic2xhazFAc2FtYXJhZG9tLnJ1Iiwicm9sZSI6InN1cGVyIn0sImlhdCI6MTU5ODQzMDY0NCwiZXhwIjoxNTk4NDQwNjQ0fQ.qVO39TpGKbPad8hv9jO8YCcrsmAU7E9vc5h8LE4XiHU",
 									"type": "string"
 								}
 							]
@@ -254,6 +254,47 @@
 								"api",
 								"users",
 								"signin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateRole",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoxLCJuYW1lIjoic3VwZXJuaWtvbGFpIiwic3VybmFtZSI6InNsYWRraWkiLCJlbWFpbCI6InNsYWtAc2FtYXJhZG9tLnJ1Iiwicm9sZSI6InN1cGVyIn0sImlhdCI6MTU5ODkwOTk0NywiZXhwIjoxNTk4OTE5OTQ3fQ.WnfVY9mF-jbpSZRGwD5ELFiPUMug_JaXBA3LBKkaVBA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{   \n    \"role\": \"user\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/users/2/role",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"users",
+								"2",
+								"role"
 							]
 						}
 					},
