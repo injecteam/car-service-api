@@ -73,10 +73,10 @@ export class UserService {
         { confirmationUUID: uuid, isConfirmed: false },
         { isConfirmed: true },
       );
-      const affected: number = result.affected;
-      if (affected === 0) throw new NotFoundException();
+      if (!!result.affected) throw new NotFoundException();
       return `Congrats! User with ${uuid} uuid has been successfully confirmed.`;
     } catch (error) {
+      if (error.status === 404) throw error;
       throw new InternalServerErrorException();
     }
   }
@@ -106,17 +106,20 @@ export class UserService {
       );
       return { access_token: jwt };
     } catch (error) {
-      throw new UnauthorizedException('Invalid credentials.');
+      if (error.status === 401) throw error;
+      throw new InternalServerErrorException();
     }
   }
 
   async findAll(): Promise<FindAllResponseDTO[]> {
     try {
       const users: FindAllResponseDTO[] = await this.userRepository.find();
-      if (!users.length) throw new InternalServerErrorException();
+      if (!users.length) throw new NotFoundException();
       users.forEach(user => delete user.role);
       return users;
     } catch (error) {
+      if (error.code === 'P0002' || error.status === 404)
+        throw new NotFoundException();
       throw new InternalServerErrorException();
     }
   }
@@ -128,7 +131,8 @@ export class UserService {
       delete user.role;
       return user;
     } catch (error) {
-      if (error.code === 'P0002') throw new NotFoundException();
+      if (error.code === 'P0002' || error.status === 404)
+        throw new NotFoundException();
       throw new InternalServerErrorException();
     }
   }
@@ -141,7 +145,8 @@ export class UserService {
       if (!user) throw new NotFoundException();
       return user;
     } catch (error) {
-      if (error.code === 'P0002') throw new NotFoundException();
+      if (error.code === 'P0002' || error.status === 404)
+        throw new NotFoundException();
       throw new InternalServerErrorException();
     }
   }
@@ -155,11 +160,11 @@ export class UserService {
         id,
         updateRequestDTO,
       );
-      const affected: number = result.affected;
-      if (affected === 0) throw new NotFoundException();
+      if (!!result.affected) throw new NotFoundException();
       const user: UpdateResponseDTO = await this.userRepository.findOne(id);
       return user;
     } catch (error) {
+      if (error.status === 404) throw error;
       throw new InternalServerErrorException();
     }
   }
@@ -168,10 +173,10 @@ export class UserService {
   async delete(id: number): Promise<number> {
     try {
       const result: DeleteResult = await this.userRepository.delete(id);
-      const affected: number = result.affected;
-      if (affected === 0) throw new NotFoundException();
-      return affected;
+      if (!!result.affected) throw new NotFoundException();
+      return result.affected;
     } catch (error) {
+      if (error.status === 404) throw error;
       throw new InternalServerErrorException();
     }
   }
@@ -185,11 +190,11 @@ export class UserService {
         id,
         updateRoleRequestDTO,
       );
-      const affected: number = result.affected;
-      if (affected === 0) throw new NotFoundException();
+      if (!!result.affected) throw new NotFoundException();
       const user: UpdateRoleResponseDTO = await this.userRepository.findOne(id);
       return user;
     } catch (error) {
+      if (error.status === 404) throw error;
       throw new InternalServerErrorException();
     }
   }
