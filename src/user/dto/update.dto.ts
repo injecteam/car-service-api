@@ -8,7 +8,6 @@ import {
   Max,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { User } from '../user.entity';
 
 export class UpdateRequestDTO {
   @IsOptional()
@@ -42,5 +41,3 @@ export class UpdateRequestDTO {
   @ApiProperty({ type: Number, minimum: 18, maximum: 100, description: 'age' })
   readonly age?: number;
 }
-
-export class UpdateResponseDTO extends User {}

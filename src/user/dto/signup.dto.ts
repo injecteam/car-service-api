@@ -69,7 +69,6 @@ export class SignUpRequestDTO {
   @Matches(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).*$/, {
     message: 'The password is too week, please set up a more complex password.',
   })
-  // FIXME: Here must be the PASSWORD, not the pure random string
   @ApiProperty({
     description: 'password',
     type: String,
