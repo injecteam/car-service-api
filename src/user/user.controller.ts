@@ -76,7 +76,6 @@ export class UserController {
   @ApiInternalServerErrorResponse()
   // TODO: Describe API response content DTO (swagger stuff)
   confirm(@Param('uuid') uuid: string): Promise<string> {
-    console.log(uuid);
     return this.userService.confirm(uuid);
   }
 
