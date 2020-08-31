@@ -10,8 +10,6 @@ import {
   UseGuards,
   Controller,
   ValidationPipe,
-  UseInterceptors,
-  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -37,14 +35,8 @@ import { AuthorizationRole } from 'src/authorization/authorization-role.enum';
 // DTOs
 import { SignUpRequestDTO } from './dto/signup.dto';
 import { SignInRequestDTO, SignInResponseDTO } from './dto/signin.dto';
-import { FindAllResponseDTO } from './dto/find-all.dto';
-import { FindByIdResponseDTO } from './dto/find-by-id.dto';
-import { FindByEmailResponseDTO } from './dto/find-by-email.dto';
-import { UpdateRequestDTO, UpdateResponseDTO } from './dto/update.dto';
-import {
-  UpdateRoleRequestDTO,
-  UpdateRoleResponseDTO,
-} from './dto/update-role.dto';
+import { UpdateRequestDTO } from './dto/update.dto';
+import { UpdateRoleRequestDTO } from './dto/update-role.dto';
 import { User } from './user.entity';
 
 @Controller('users')
@@ -53,7 +45,6 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post('signup')
-  @UseInterceptors(ClassSerializerInterceptor)
   @ApiBody({ type: SignUpRequestDTO })
   @ApiCreatedResponse({
     description: 'User has been successfully registered.',
@@ -91,42 +82,38 @@ export class UserController {
     return this.userService.signIn(signInRequestDTO);
   }
 
-  @Get()
-  @UseInterceptors(ClassSerializerInterceptor)
-  @ApiOkResponse({ description: 'Users have been successfully returned.' })
-  @ApiInternalServerErrorResponse()
-  // TODO: Describe API response content DTO (swagger stuff)
-  findAll(): Promise<FindAllResponseDTO[]> {
-    return this.userService.findAll();
-  }
-
-  @Get(':id')
-  @UseInterceptors(ClassSerializerInterceptor)
-  @ApiOkResponse({ description: 'User has been successfully returned.' })
-  @ApiNotFoundResponse()
-  @ApiInternalServerErrorResponse()
-  // TODO: Describe API response content DTO (swagger stuff)
-  findById(@Param('id') id: number): Promise<FindByIdResponseDTO> {
-    return this.userService.findById(id);
-  }
-
   @Get('findbyemail')
   @Roles(AuthorizationRole.SUPER, AuthorizationRole.ADMIN)
   @UseGuards(AuthenticationJwtGuard, RoleGuard)
-  @UseInterceptors(ClassSerializerInterceptor)
   @ApiBearerAuth()
   @ApiOkResponse({ description: 'User has been successfully returned.' })
   @ApiNotFoundResponse()
   @ApiInternalServerErrorResponse()
   // TODO: Describe API response content DTO (swagger stuff)
-  findByEmail(@Query('email') email: string): Promise<FindByEmailResponseDTO> {
+  findByEmail(@Query('email') email: string): Promise<User> {
     return this.userService.findByEmail(email);
+  }
+
+  @Get()
+  @ApiOkResponse({ description: 'Users have been successfully returned.' })
+  @ApiInternalServerErrorResponse()
+  // TODO: Describe API response content DTO (swagger stuff)
+  findAll(): Promise<User[]> {
+    return this.userService.findAll();
+  }
+
+  @Get(':id')
+  @ApiOkResponse({ description: 'User has been successfully returned.' })
+  @ApiNotFoundResponse()
+  @ApiInternalServerErrorResponse()
+  // TODO: Describe API response content DTO (swagger stuff)
+  findById(@Param('id') id: number): Promise<User> {
+    return this.userService.findById(id);
   }
 
   @Put(':id')
   @Roles(AuthorizationRole.SUPER, AuthorizationRole.ADMIN)
   @UseGuards(AuthenticationJwtGuard, OwnOrRoleGuard)
-  @UseInterceptors(ClassSerializerInterceptor)
   @ApiBearerAuth()
   @ApiOkResponse({ description: 'User has been successfully updated.' })
   @ApiNotFoundResponse()
@@ -136,7 +123,7 @@ export class UserController {
     @Param('id') id: number,
     @Body(new ValidationPipe({ whitelist: true }))
     updateRequestDTO: UpdateRequestDTO,
-  ): Promise<UpdateResponseDTO> {
+  ): Promise<User> {
     return this.userService.update(id, updateRequestDTO);
   }
 
@@ -156,7 +143,6 @@ export class UserController {
   @Put(':id/role')
   @Roles(AuthorizationRole.SUPER)
   @UseGuards(AuthenticationJwtGuard, RoleGuard)
-  @UseInterceptors(ClassSerializerInterceptor)
   @ApiBearerAuth()
   @ApiOkResponse({ description: 'User (role) has been successfully updated.' })
   @ApiNotFoundResponse()
@@ -166,7 +152,7 @@ export class UserController {
     @Param('id') id: number,
     @Body(new ValidationPipe({ whitelist: true }))
     updateRoleRequestDTO: UpdateRoleRequestDTO,
-  ): Promise<UpdateRoleResponseDTO> {
+  ): Promise<User> {
     return this.userService.updateRole(id, updateRoleRequestDTO);
   }
 }
