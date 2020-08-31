@@ -11,7 +11,6 @@ import {
   Min,
   Max,
 } from 'class-validator';
-import { Exclude } from 'class-transformer';
 
 @Entity('users')
 export class User extends AbstractEntity {
@@ -62,7 +61,6 @@ export class User extends AbstractEntity {
   @IsString()
   @MinLength(4)
   @MaxLength(30)
-  @Exclude({ toPlainOnly: true })
   // TODO: Describe API property (swagger stuff)
   password: string;
 
