@@ -35,7 +35,7 @@ import { Roles } from 'src/authorization/roles.decorator';
 // Enums
 import { AuthorizationRole } from 'src/authorization/authorization-role.enum';
 // DTOs
-import { SignUpRequestDTO, SignUpResponseDTO } from './dto/signup.dto';
+import { SignUpRequestDTO } from './dto/signup.dto';
 import { SignInRequestDTO, SignInResponseDTO } from './dto/signin.dto';
 import { FindAllResponseDTO } from './dto/find-all.dto';
 import { FindByIdResponseDTO } from './dto/find-by-id.dto';
@@ -45,11 +45,12 @@ import {
   UpdateRoleRequestDTO,
   UpdateRoleResponseDTO,
 } from './dto/update-role.dto';
+import { User } from './user.entity';
 
 @Controller('users')
 @ApiTags('User')
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(private readonly userService: UserService) {}
 
   @Post('signup')
   @UseInterceptors(ClassSerializerInterceptor)
@@ -63,7 +64,7 @@ export class UserController {
   signUp(
     @Body(new ValidationPipe({ whitelist: true }))
     signUpRequestDTO: SignUpRequestDTO,
-  ): Promise<SignUpResponseDTO> {
+  ): Promise<User> {
     return this.userService.signUp(signUpRequestDTO);
   }
 
