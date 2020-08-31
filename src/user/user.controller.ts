@@ -68,6 +68,18 @@ export class UserController {
     return this.userService.signUp(signUpRequestDTO);
   }
 
+  @Get('confirm/:uuid')
+  @ApiOkResponse({
+    description: 'User has been successfully confirmed.',
+  })
+  @ApiNotFoundResponse()
+  @ApiInternalServerErrorResponse()
+  // TODO: Describe API response content DTO (swagger stuff)
+  confirm(@Param('uuid') uuid: string): Promise<string> {
+    console.log(uuid);
+    return this.userService.confirm(uuid);
+  }
+
   @Post('signin')
   @ApiBody({ type: SignInRequestDTO })
   @ApiOkResponse({ description: 'User has been successfully logged in.' })
