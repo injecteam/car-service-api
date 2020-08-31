@@ -66,6 +66,22 @@ export class User extends AbstractEntity {
   // TODO: Describe API property (swagger stuff)
   password: string;
 
+  @Column({
+    type: 'boolean',
+    nullable: false,
+    default: false,
+    name: 'is-confirmed',
+  })
+  isConfirmed: boolean;
+
+  @Column({
+    type: 'varchar',
+    unique: true,
+    nullable: false,
+    name: 'confirmation-uuid',
+  })
+  confirmationUUID: string;
+
   @BeforeInsert()
   emailToLowerCase(): void {
     this.email = this.email.toLowerCase();
