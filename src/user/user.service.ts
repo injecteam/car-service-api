@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DeleteResult, UpdateResult } from 'typeorm';
+import { v4 } from 'uuid';
 // Services
 import { AuthenticationService } from 'src/authentication/authentication.service';
 // Entities
@@ -15,7 +16,7 @@ import { User } from './user.entity';
 // Types
 import { UserJwtPayload } from 'src/authentication/authentication.type';
 // DTOs
-import { SignUpRequestDTO, SignUpResponseDTO } from './dto/signup.dto';
+import { SignUpRequestDTO } from './dto/signup.dto';
 import { SignInRequestDTO, SignInResponseDTO } from './dto/signin.dto';
 import { FindAllResponseDTO } from './dto/find-all.dto';
 import { FindByIdResponseDTO } from './dto/find-by-id.dto';
@@ -25,25 +26,36 @@ import {
   UpdateRoleRequestDTO,
   UpdateRoleResponseDTO,
 } from './dto/update-role.dto';
+import { MailerService } from 'src/mailer/mailer.service';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly authenticationService: AuthenticationService,
+    private readonly mailerService: MailerService,
   ) {}
 
-  async signUp(signUpRequestDTO: SignUpRequestDTO): Promise<SignUpResponseDTO> {
+  async signUp(signUpRequestDTO: SignUpRequestDTO): Promise<User> {
     try {
       const hashedPassword: string = await this.authenticationService.hashPassword(
         signUpRequestDTO.password,
       );
-      const user: SignUpResponseDTO = this.userRepository.create(
-        signUpRequestDTO,
-      );
+      const user: User = this.userRepository.create(signUpRequestDTO);
       user.password = hashedPassword;
       await this.userRepository.save(user);
+
+      const confirmationUUID = v4();
+      const confirmationEmail = `<b>Please confirm your email </b><a href="${process.env.APPLICATION_HOST}/api/users/confirm/${confirmationUUID}>">with this link</a>`;
+      await this.mailerService.send(
+        user.email,
+        'Please confirm your email',
+        confirmationEmail,
+      );
+
       delete user.role;
+      delete user.password;
+
       return user;
     } catch (error) {
       if (error.code === '23505')
@@ -122,7 +134,6 @@ export class UserService {
     updateRequestDTO: UpdateRequestDTO,
   ): Promise<UpdateResponseDTO> {
     try {
-      console.log('heree');
       const result: UpdateResult = await this.userRepository.update(
         id,
         updateRequestDTO,
@@ -164,5 +175,11 @@ export class UserService {
     } catch (error) {
       throw new InternalServerErrorException();
     }
+  }
+
+  async confirm(uuid: string): Promise<string> {
+    // const user: User = await this.userRepository.findOne({'confirmation-uuid': uuid})
+    // return `The user ${JSON.stringify(user)} uuid was successfully confirmed`
+    return `The user with ${uuid} uuid has been successfully confirmed.`;
   }
 }
