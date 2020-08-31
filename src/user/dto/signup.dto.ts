@@ -9,7 +9,6 @@ import {
   IsEmail,
   Matches,
 } from 'class-validator';
-import { User } from '../user.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class SignUpRequestDTO {
@@ -82,5 +81,3 @@ export class SignUpRequestDTO {
   })
   readonly password: string;
 }
-
-export class SignUpResponseDTO extends User {}
