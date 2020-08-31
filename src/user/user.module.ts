@@ -5,15 +5,17 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserController } from './user.controller';
 import { AuthorizationModule } from 'src/authorization/authorization.module';
 import { AuthenticationModule } from 'src/authentication/authentication.module';
+import { MailerModule } from 'src/mailer/mailer.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
     AuthenticationModule,
     AuthorizationModule,
+    MailerModule,
   ],
   providers: [UserService],
   controllers: [UserController],
-  exports: [UserService],
+  exports: [],
 })
 export class UserModule {}
