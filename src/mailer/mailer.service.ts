@@ -2,12 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 @Injectable()
 export class MailerService {
-  async send(
-    from: string,
-    to: string,
-    subject: string,
-    html: string,
-  ): Promise<void> {
+  async send(to: string, subject: string, html: string): Promise<void> {
     const transport = nodemailer.createTransport({
       host: process.env.NODE_MAILER_HOST,
       port: Number(process.env.NODE_MAILER_PORT),
@@ -18,7 +13,12 @@ export class MailerService {
       },
     });
 
-    const result = await transport.sendMail({ from, to, subject, html });
+    const result = await transport.sendMail({
+      from: `"car_service_api" <${process.env.NODE_MAILER_EMAIL}>`,
+      to,
+      subject,
+      html,
+    });
 
     console.info(result);
   }
