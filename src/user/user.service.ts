@@ -43,10 +43,13 @@ export class UserService {
       );
       const user: User = this.userRepository.create(signUpRequestDTO);
       user.password = hashedPassword;
-      await this.userRepository.save(user);
 
       const confirmationUUID = v4();
-      const confirmationEmail = `<b>Please confirm your email </b><a href="${process.env.APPLICATION_HOST}/api/users/confirm/${confirmationUUID}>">with this link</a>`;
+      user.confirmationUUID = confirmationUUID;
+
+      await this.userRepository.save(user);
+
+      const confirmationEmail = `<b>Please confirm your email </b><a href="${process.env.APPLICATION_HOST}/api/users/confirm/${confirmationUUID}">with this link</a>`;
       await this.mailerService.send(
         user.email,
         'Please confirm your email',
@@ -177,9 +180,5 @@ export class UserService {
     }
   }
 
-  async confirm(uuid: string): Promise<string> {
-    // const user: User = await this.userRepository.findOne({'confirmation-uuid': uuid})
-    // return `The user ${JSON.stringify(user)} uuid was successfully confirmed`
-    return `The user with ${uuid} uuid has been successfully confirmed.`;
   }
 }
