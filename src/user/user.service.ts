@@ -67,6 +67,20 @@ export class UserService {
     }
   }
 
+  async confirm(uuid: string): Promise<string> {
+    try {
+      const result: UpdateResult = await this.userRepository.update(
+        { confirmationUUID: uuid, isConfirmed: false },
+        { isConfirmed: true },
+      );
+      const affected: number = result.affected;
+      if (affected === 0) throw new NotFoundException();
+      return `Congrats! User with ${uuid} uuid has been successfully confirmed.`;
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
+  }
+
   async signIn(signInRequestDTO: SignInRequestDTO): Promise<SignInResponseDTO> {
     try {
       const { email, password } = signInRequestDTO;
@@ -175,20 +189,6 @@ export class UserService {
       if (affected === 0) throw new NotFoundException();
       const user: UpdateRoleResponseDTO = await this.userRepository.findOne(id);
       return user;
-    } catch (error) {
-      throw new InternalServerErrorException();
-    }
-  }
-
-  async confirm(uuid: string): Promise<string> {
-    try {
-      const result: UpdateResult = await this.userRepository.update(
-        { confirmationUUID: uuid },
-        { isConfirmed: true },
-      );
-      const affected: number = result.affected;
-      if (affected === 0) throw new NotFoundException();
-      return `Congrats! User with ${uuid} uuid has been successfully confirmed.`;
     } catch (error) {
       throw new InternalServerErrorException();
     }
