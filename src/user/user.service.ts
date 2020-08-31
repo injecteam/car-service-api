@@ -18,14 +18,8 @@ import { UserJwtPayload } from 'src/authentication/authentication.type';
 // DTOs
 import { SignUpRequestDTO } from './dto/signup.dto';
 import { SignInRequestDTO, SignInResponseDTO } from './dto/signin.dto';
-import { FindAllResponseDTO } from './dto/find-all.dto';
-import { FindByIdResponseDTO } from './dto/find-by-id.dto';
-import { FindByEmailResponseDTO } from './dto/find-by-email.dto';
-import { UpdateRequestDTO, UpdateResponseDTO } from './dto/update.dto';
-import {
-  UpdateRoleRequestDTO,
-  UpdateRoleResponseDTO,
-} from './dto/update-role.dto';
+import { UpdateRequestDTO } from './dto/update.dto';
+import { UpdateRoleRequestDTO } from './dto/update-role.dto';
 import { MailerService } from 'src/mailer/mailer.service';
 
 @Injectable()
@@ -43,22 +37,17 @@ export class UserService {
       );
       const user: User = this.userRepository.create(signUpRequestDTO);
       user.password = hashedPassword;
-
       const confirmationUUID = v4();
       user.confirmationUUID = confirmationUUID;
-
       await this.userRepository.save(user);
-
       const confirmationEmail = `<b>Please confirm your email </b><a href="${process.env.APPLICATION_HOST}/api/users/confirm/${confirmationUUID}">with this link</a>`;
       await this.mailerService.send(
         user.email,
         'Please confirm your email',
         confirmationEmail,
       );
-
       delete user.role;
       delete user.password;
-
       return user;
     } catch (error) {
       if (error.code === '23505')
@@ -73,7 +62,7 @@ export class UserService {
         { confirmationUUID: uuid, isConfirmed: false },
         { isConfirmed: true },
       );
-      if (!!result.affected) throw new NotFoundException();
+      if (!result.affected) throw new NotFoundException();
       return `Congrats! User with ${uuid} uuid has been successfully confirmed.`;
     } catch (error) {
       if (error.status === 404) throw error;
@@ -111,11 +100,14 @@ export class UserService {
     }
   }
 
-  async findAll(): Promise<FindAllResponseDTO[]> {
+  async findAll(): Promise<User[]> {
     try {
-      const users: FindAllResponseDTO[] = await this.userRepository.find();
+      const users: User[] = await this.userRepository.find();
       if (!users.length) throw new NotFoundException();
-      users.forEach(user => delete user.role);
+      users.forEach(user => {
+        delete user.role;
+        delete user.password;
+      });
       return users;
     } catch (error) {
       if (error.code === 'P0002' || error.status === 404)
@@ -124,11 +116,12 @@ export class UserService {
     }
   }
 
-  async findById(id: number): Promise<FindByIdResponseDTO> {
+  async findById(id: number): Promise<User> {
     try {
-      const user: FindByIdResponseDTO = await this.userRepository.findOne(id);
+      const user: User = await this.userRepository.findOne(id);
       if (!user) throw new NotFoundException();
       delete user.role;
+      delete user.password;
       return user;
     } catch (error) {
       if (error.code === 'P0002' || error.status === 404)
@@ -137,12 +130,13 @@ export class UserService {
     }
   }
 
-  async findByEmail(email: string): Promise<FindByEmailResponseDTO> {
+  async findByEmail(email: string): Promise<User> {
     try {
       const query = this.userRepository.createQueryBuilder('user');
       query.where('user.email = :email', { email });
-      const user: FindByEmailResponseDTO = await query.getOne();
+      const user: User = await query.getOne();
       if (!user) throw new NotFoundException();
+      delete user.password;
       return user;
     } catch (error) {
       if (error.code === 'P0002' || error.status === 404)
@@ -151,17 +145,15 @@ export class UserService {
     }
   }
 
-  async update(
-    id: number,
-    updateRequestDTO: UpdateRequestDTO,
-  ): Promise<UpdateResponseDTO> {
+  async update(id: number, updateRequestDTO: UpdateRequestDTO): Promise<User> {
     try {
       const result: UpdateResult = await this.userRepository.update(
         id,
         updateRequestDTO,
       );
-      if (!!result.affected) throw new NotFoundException();
-      const user: UpdateResponseDTO = await this.userRepository.findOne(id);
+      if (!result.affected) throw new NotFoundException();
+      const user: User = await this.userRepository.findOne(id);
+      delete user.password;
       return user;
     } catch (error) {
       if (error.status === 404) throw error;
@@ -173,7 +165,7 @@ export class UserService {
   async delete(id: number): Promise<number> {
     try {
       const result: DeleteResult = await this.userRepository.delete(id);
-      if (!!result.affected) throw new NotFoundException();
+      if (!result.affected) throw new NotFoundException();
       return result.affected;
     } catch (error) {
       if (error.status === 404) throw error;
@@ -184,14 +176,15 @@ export class UserService {
   async updateRole(
     id: number,
     updateRoleRequestDTO: UpdateRoleRequestDTO,
-  ): Promise<UpdateRoleResponseDTO> {
+  ): Promise<User> {
     try {
       const result: UpdateResult = await this.userRepository.update(
         id,
         updateRoleRequestDTO,
       );
-      if (!!result.affected) throw new NotFoundException();
-      const user: UpdateRoleResponseDTO = await this.userRepository.findOne(id);
+      if (!result.affected) throw new NotFoundException();
+      const user: User = await this.userRepository.findOne(id);
+      delete user.password;
       return user;
     } catch (error) {
       if (error.status === 404) throw error;
