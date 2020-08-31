@@ -180,5 +180,17 @@ export class UserService {
     }
   }
 
+  async confirm(confirmationUUID: string): Promise<string> {
+    try {
+      const result: UpdateResult = await this.userRepository.update(
+        { confirmationUUID },
+        { isConfirmed: true },
+      );
+      const affected: number = result.affected;
+      if (affected === 0) throw new NotFoundException();
+      return `Congrats! User with ${confirmationUUID} uuid has been successfully confirmed.`;
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 }
